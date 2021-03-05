@@ -49,12 +49,14 @@ def save_model(args):
 
 def main():
     args = parse_args()
-    port = 8888
+    
+    print(os.environ)
+    
     num_gpus = int(os.environ["SM_NUM_GPUS"])
-    hosts = json.loads(os.environ["SM_HOSTS"])
-    num_nodes = len(hosts)
-    current_host = os.environ["SM_CURRENT_HOST"]
-    rank = hosts.index(current_host)
+    num_nodes = os.environ["WORLD_SIZE"]
+    rank = os.environ["RANK"]
+    master_addr = os.environ["MASTER_ADDR"]
+    master_port = os.environ["MASTER_PORT"]
     os.environ["NCCL_DEBUG"] = "INFO"
 
     if num_nodes > 1:
@@ -62,14 +64,14 @@ def main():
             --nnodes={num_nodes}  \
             --node_rank={rank}  \
             --nproc_per_node={num_gpus}  \
-            --master_addr={hosts[0]}  \
-            --master_port={port} \
-            ./train.py \
+            --master_addr={master_addr}  \
+            --master_port={master_port} \
+            ./run_glue.py \
             {"".join([f" --{parameter} {value}" for parameter,value in args.__dict__.items()])}"""
     else:
         cmd = f"""python -m torch.distributed.launch \
         --nproc_per_node={num_gpus}  \
-        ./train.py \
+        ./run_glue.py \
         {"".join([f" --{parameter} {value}" for parameter,value in args.__dict__.items()])}"""
     try:
         subprocess.run(cmd, shell=True)

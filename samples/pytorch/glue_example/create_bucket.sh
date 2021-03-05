@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Creating Bucket, upload trainer, etc..."
 
-BUCKET_NAME=<your bucket>
+BUCKET_NAME=ddp-pytorch-test
 
 REGION=us-central1
 

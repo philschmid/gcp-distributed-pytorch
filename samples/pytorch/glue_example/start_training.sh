@@ -2,10 +2,14 @@
 echo "Submitting AI Platform PyTorch job"
 
 # BUCKET_NAME: Change to your bucket name.
-BUCKET_NAME=<your bucket>
+BUCKET_NAME=ddp-pytorch-test
 
 # The PyTorch image provided by AI Platform Training.
 IMAGE_URI=gcr.io/cloud-ml-public/training/pytorch-gpu.1-6
+
+# Machines used for training
+MACHINE_TYPE=complex_model_m_p100
+
 
 # JOB_NAME: the name of your job running on AI Platform.
 JOB_NAME=pytorch_job_$(date +%Y%m%d_%H%M%S)
@@ -27,15 +31,18 @@ JOB_DIR=gs://${BUCKET_NAME}/${JOB_NAME}/models
 gcloud ai-platform jobs submit training ${JOB_NAME} \
     --region ${REGION} \
     --master-image-uri ${IMAGE_URI} \
-    --scale-tier BASIC \
     --job-dir ${JOB_DIR} \
     --module-name trainer.task \
     --package-path ${PACKAGE_PATH} \
+    --scale-tier custom \
+    --master-machine-type ${MACHINE_TYPE} \
+    --worker-machine-type ${MACHINE_TYPE} \
+    --worker-count 1 \
     -- \
     --model_name_or_path bert-base-cased \
     --task_name mrpc \
-    --do_train \
-    --do_eval \
+    --do_train True \
+    --do_eval True \
     --max_seq_length 128 \
     --per_device_train_batch_size 32 \
     --learning_rate 2e-5 \
