@@ -1,6 +1,8 @@
 from argparse import ArgumentParser
+from google.cloud import storage
 import os
 import json
+import datetime
 import subprocess
 import logging
 import glob
@@ -49,17 +51,17 @@ def save_model(args):
 
 def main():
     args = parse_args()
-    
+
     print(os.environ)
-    
-    num_gpus = int(os.environ["SM_NUM_GPUS"])
+
+    num_gpus = 4  # TODO: find a better way to get the gpu number
     num_nodes = os.environ["WORLD_SIZE"]
     rank = os.environ["RANK"]
     master_addr = os.environ["MASTER_ADDR"]
     master_port = os.environ["MASTER_PORT"]
     os.environ["NCCL_DEBUG"] = "INFO"
 
-    if num_nodes > 1:
+    if int(num_nodes) > 1:
         cmd = f"""python -m torch.distributed.launch \
             --nnodes={num_nodes}  \
             --node_rank={rank}  \

@@ -2,6 +2,8 @@
 
 Example for distributed training on multiple-gpus
 
+# TODO: Script not uploaded to GCS
+
 # Getting started
 
 1. Install `gcloud` https://cloud.google.com/sdk/docs/install

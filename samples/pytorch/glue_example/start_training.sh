@@ -27,7 +27,7 @@ JOB_DIR=gs://${BUCKET_NAME}/${JOB_NAME}/models
 # comment if you provide train_data
 # TRAIN_FILES=${GCS_TAXI_TRAIN_SMALL}
 # EVAL_FILES=${GCS_TAXI_EVAL_SMALL}
-
+# https://cloud.google.com/ai-platform/training/docs/reference/rest/v1/projects.jobs#TrainingInput
 gcloud ai-platform jobs submit training ${JOB_NAME} \
     --region ${REGION} \
     --master-image-uri ${IMAGE_URI} \
