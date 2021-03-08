@@ -24,6 +24,7 @@ setup(
     version="0.1",
     install_requires=REQUIRED_PACKAGES,
     packages=find_packages(),
+    scripts=["run_glue.py"],
     include_package_data=True,
     description="AI Platform | Training | PyTorch | Structured | Python Package",
 )

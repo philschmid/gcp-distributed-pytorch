@@ -2,7 +2,7 @@
 
 Example for distributed training on multiple-gpus
 
-# TODO: Script not uploaded to GCS
+# TODO: Add Script to setup and enable install
 
 # Getting started
 
@@ -30,7 +30,21 @@ b. Init existing project
 gcloud config set project  <PROJECT_ID>
 ```
 
-4.
+4. Start training with
+
+before you can start training adjust the variables in `start_training.sh`
+
+```bash
+./start_training.sh
+```
+
+### Extra
+
+1. Zip you Trainer manually https://cloud.google.com/ai-platform/prediction/docs/custom-prediction-routines
+
+```bash
+python setup.py sdist --formats=gztar
+```
 
 ## Ressources
 

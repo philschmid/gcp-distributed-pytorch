@@ -7,6 +7,8 @@ import subprocess
 import logging
 import glob
 
+from trainer.run_glue import main
+
 logger = logging.getLogger(__name__)
 
 
