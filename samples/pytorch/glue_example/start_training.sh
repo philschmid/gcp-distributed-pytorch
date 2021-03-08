@@ -14,6 +14,7 @@ MACHINE_TYPE=complex_model_m_p100
 # JOB_NAME: the name of your job running on AI Platform.
 JOB_NAME=pytorch_job_$(date +%Y%m%d_%H%M%S)
 
+PACKAGE_PATH=./trainer # this can be a GCS location to a zipped and uploaded package
 
 # REGION: select a region from https://cloud.google.com/ml-engine/docs/regions
 # or use the default '`us-central1`'. The region is where the job will be run.
@@ -27,30 +28,25 @@ JOB_DIR=gs://${BUCKET_NAME}/${JOB_NAME}/models
 # TRAIN_FILES=${GCS_TAXI_TRAIN_SMALL}
 # EVAL_FILES=${GCS_TAXI_EVAL_SMALL}
 
-# create trainer package
-echo "creating Trainer package"
 
-python setup.py sdist --formats=gztar
+# upload train script
+TRAIN_SCRIPT_FILE=gs://${BUCKET_NAME}/${JOB_NAME}/code/run_glue.py
 
-MODULE_NAME=trainer.task
-PACKAGE_PATH=dist/trainer-0.1.tar.gz
-PATH_TO_PACKAGED_TRAINER=gs://${BUCKET_NAME}/code/trainer-0.1.tar.gz
+gsutil cp ./trainer/run_glue.py gs://${BUCKET_NAME}/${JOB_NAME}/code
 
-gsutil cp ${PACKAGE_PATH} gs://${BUCKET_NAME}/code/
-
-# start training
 # https://cloud.google.com/ai-platform/training/docs/reference/rest/v1/projects.jobs#TrainingInput
 gcloud ai-platform jobs submit training ${JOB_NAME} \
     --region ${REGION} \
     --master-image-uri ${IMAGE_URI} \
     --job-dir ${JOB_DIR} \
-    --module-name ${MODULE_NAME} \
-    --packages ${PATH_TO_PACKAGED_TRAINER} \
+    --module-name trainer.task \
+    --package-path ${PACKAGE_PATH} \
     --scale-tier custom \
     --master-machine-type ${MACHINE_TYPE} \
     --worker-machine-type ${MACHINE_TYPE} \
     --worker-count 1 \
     -- \
+    --train_script ${TRAIN_SCRIPT_FILE} \
     --model_name_or_path bert-base-cased \
     --task_name mrpc \
     --do_train True \
@@ -69,5 +65,4 @@ gcloud ai-platform jobs stream-logs ${JOB_NAME}
 # Verify the model was exported
 echo "Verify the model was exported:"
 gsutil ls ${JOB_DIR}/model_*
-
 

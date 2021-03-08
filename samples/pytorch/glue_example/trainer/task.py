@@ -33,6 +33,26 @@ def upload_local_directory_to_gcs(local_path, bucket, gcs_path):
         blob.upload_from_filename(local_file)
 
 
+def download_blob(bucket_name, source_blob_name, destination_file_name):
+    """Downloads a blob from the bucket."""
+    # bucket_name = "your-bucket-name"
+    # source_blob_name = "storage-object-name"
+    # destination_file_name = "local/path/to/file"
+
+    storage_client = storage.Client()
+
+    bucket = storage_client.bucket(bucket_name)
+
+    # Construct a client side representation of a blob.
+    # Note `Bucket.blob` differs from `Bucket.get_blob` as it doesn't retrieve
+    # any content from Google Cloud Storage. As we don't need additional data,
+    # using `Bucket.blob` is preferred here.
+    blob = bucket.blob(source_blob_name)
+    blob.download_to_filename(destination_file_name)
+
+    print("Blob {} downloaded to {}.".format(source_blob_name, destination_file_name))
+
+
 def save_model(args):
     """Saves the model to Google Cloud Storage
     Args:
@@ -55,6 +75,15 @@ def main():
     args = parse_args()
 
     print(os.environ)
+    print(args.job_dir)
+    print(args.train_script)
+    scheme = "gs://"
+    bucket_name = args.train_script[len(scheme) :].split("/")[0]
+
+    prefix = "{}{}/".format(scheme, bucket_name)
+    bucket_path = args.train_script[len(prefix) :].rstrip("/")
+
+    download_blob(bucket_name, bucket_path, "train.py")
 
     num_gpus = 4  # TODO: find a better way to get the gpu number
     num_nodes = os.environ["WORLD_SIZE"]
@@ -70,12 +99,12 @@ def main():
             --nproc_per_node={num_gpus}  \
             --master_addr={master_addr}  \
             --master_port={master_port} \
-            ./run_glue.py \
+            ./train.py \
             {"".join([f" --{parameter} {value}" for parameter,value in args.__dict__.items()])}"""
     else:
         cmd = f"""python -m torch.distributed.launch \
         --nproc_per_node={num_gpus}  \
-        ./run_glue.py \
+        ./train.py \
         {"".join([f" --{parameter} {value}" for parameter,value in args.__dict__.items()])}"""
     try:
         subprocess.run(cmd, shell=True)
