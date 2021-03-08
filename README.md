@@ -2,7 +2,7 @@
 
 Example for distributed training on multiple-gpus
 
-# TODO: Add Script to setup and enable install
+# TODO: Add Script to setup and enable install -> or load it before executing from gcs with gsutil
 
 # Getting started
 

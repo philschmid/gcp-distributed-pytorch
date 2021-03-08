@@ -71,4 +71,3 @@ echo "Verify the model was exported:"
 gsutil ls ${JOB_DIR}/model_*
 
 
-python -u -c 'import sys, setuptools, tokenize; sys.argv[0] = '\"'\"'/tmp/pip-req-build-e0dr_6jo/setup.py'\"'\"'; __file__='\"'\"'/tmp/pip-req-build-e0dr_6jo/setup.py'\"'\"';f=getattr(tokenize, '\"'\"'open'\"'\"', open)(__file__);code=f.read().replace('\"'\"'\\r\\n'\"'\"', '\"'\"'\\n'\"'\"');f.close();exec(compile(code, __file__, '\"'\"'exec'\"'\"'))' bdist_wheel -d /tmp/pip-wheel-q37ipymm\n",
